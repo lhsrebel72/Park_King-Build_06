@@ -3,6 +3,7 @@ package com.example.maupi.parkking;
 import android.content.Intent;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -21,7 +22,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private GoogleMap mMap;
     private UiSettings mUiSettings;
-    private ParkingMeterData selectedMarker;
+    private String selectedMarkerID = "111111";
+    private DatabaseHelper db = new DatabaseHelper(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +57,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         int numberOfMeters = 4;
         for(int i = 0; i < numberOfMeters; i++){
             meters.add(putDataintoMeter(i));
+        }
+
+        for(ParkingMeterData p : meters){
+            db.insertMeter(p);
         }
 
         //Puts markers on the map
@@ -121,12 +127,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         return pmd;
     }
 
+    public static void putMeterIntoDB(ParkingMeterData pmd){
+        pmd.getId();
+    }
     @Override
     public void onInfoWindowClick(Marker marker) {
         //Toast.makeText(this, marker.getSnippet(), Toast.LENGTH_SHORT).show();
 
         Intent intent = new Intent(MapsActivity.this, MeterActivity.class);
-        //intent.putExtra("ParkingMeterData", marker);
+        intent.putExtra("ParkingMeterID", selectedMarkerID);
         startActivity(intent);
         //finish();
         //setContentView(R.layout.activity_meter);

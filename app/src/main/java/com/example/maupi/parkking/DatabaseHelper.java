@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 import android.widget.Toast;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
@@ -19,7 +20,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      *      - Checking the uniqueness of the user name a user enters while creating a new account*
      *********************************************************************************************/
 
-    private static final String TABLE_NAME = "client";
+    private static final String TABLE_CLIENT = "client";
     private static final String COLUMN_ID = "id";
     private static final String COLUMN_UNAME = "uname";
     private static final String COLUMN_PASS = "pass";
@@ -28,7 +29,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 
     // Create table command
-    private static final String CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + "(" +
+    private static final String CREATE_TABLE = "CREATE TABLE " + TABLE_CLIENT + "(" +
             COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             COLUMN_UNAME + " VARCHAR(255) NOT NULL, " +
             COLUMN_PASS + " VARCHAR(255) NOT NULL, " +
@@ -43,6 +44,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_TABLE);
         db.execSQL(CREATE_TABLE_PAYMENT);
+        db.execSQL(CREATE_TABLE_METER);
         this.db = db;
     }
 
@@ -55,7 +57,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(COLUMN_PASS , c.getPass());
         values.put(COLUMN_EMAIL , c.getEmail());
 
-        db.insert(TABLE_NAME , null , values);
+        db.insert(TABLE_CLIENT , null , values);
         db.close();
     }
 
@@ -63,7 +65,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public String searchInfo(String uname){
 
         db = this.getReadableDatabase();
-        String query = "SELECT " + COLUMN_UNAME + " , " + COLUMN_PASS + " FROM " + TABLE_NAME;
+        String query = "SELECT " + COLUMN_UNAME + " , " + COLUMN_PASS + " FROM " + TABLE_CLIENT;
         Cursor cursor = db.rawQuery(query , null);
         String u , p = "not found";
         if(cursor.moveToFirst()){
@@ -86,7 +88,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public boolean uniqueUname(String uname){
 
         db = this.getReadableDatabase();
-        String query = "SELECT " + COLUMN_UNAME + " FROM " + TABLE_NAME;
+        String query = "SELECT " + COLUMN_UNAME + " FROM " + TABLE_CLIENT;
         Cursor cursor = db.rawQuery(query , null);
         String user = "";
         boolean unique = true;
@@ -141,7 +143,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             COLUMN_ZIP_CODE + " VARCHAR(6) NOT NULL , " +
             COLUMN_CITY_STATE + " VARCHAR(20) NOT NULL , " +
             COLUMN_COUNTRY + " VARCHAR(20) NOT NULL , " +
-            "FOREIGN KEY " + "(" + COLUMN_CLIENT + ") REFERENCES " + TABLE_NAME + "(" + COLUMN_ID + ") );";
+            "FOREIGN KEY " + "(" + COLUMN_CLIENT + ") REFERENCES " + TABLE_CLIENT + "(" + COLUMN_ID + ") );";
 
 
     // Checking the payment entered by the user after creating a new account to make sure it's unique
@@ -190,17 +192,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
 
-    // Get the id of the user to connect the user with his/her payment
+    // Get the id of the user to connect the user with his/her payment and meter
     public String getForeignInfo(){
         db = this.getReadableDatabase();
-        String checkExistence = "SELECT " + COLUMN_UNAME + " FROM " + TABLE_NAME + ";";
+        String checkExistence = "SELECT " + COLUMN_UNAME + " FROM " + TABLE_CLIENT + ";";
         String userExist , id = "";
         Cursor c = db.rawQuery(checkExistence , null);
         if(c.moveToFirst()){
             do{
                 userExist = c.getString(c.getColumnIndex(COLUMN_UNAME));
                 if(userExist.equals(userName)){
-                    String query  = "SELECT " + COLUMN_ID + " FROM " + TABLE_NAME +" WHERE " + COLUMN_UNAME + " = '" + userName + "';";
+                    String query  = "SELECT " + COLUMN_ID + " FROM " + TABLE_CLIENT +" WHERE " + COLUMN_UNAME + " = '" + userName + "';";
                     Cursor cursor = db.rawQuery(query , null);
                     cursor.moveToFirst();
                     id = cursor.getString(cursor.getColumnIndex(COLUMN_ID));
@@ -210,13 +212,73 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return id;
     }
 
+    /******************************************************************************************************************
+     * Creating the meter table in the database and handling the following functions                                *
+     ******************************************************************************************************************/
+    private static final String TABLE_METER = "meter";
+    private static final String COLUMN_METER_ID = "id";
+    private static final String COLUMN_METER_PRICE = "price";
+    private static final String COLUMN_LATITUDE = "latitude";
+    private static final String COLUMN_LONGITUDE = "longitude";
+    private static final String COLUMN_METER_ADDRESS = "address";
+    private static final String COLUMN_TIME_PER_USE = "usagetime";
+    private static final String COLUMN_FOREIGNKEY_CLIENT = "client";
+
+    private static final String CREATE_TABLE_METER = "CREATE TABLE " + TABLE_METER + "(" +
+            COLUMN_METER_ID + " VARCHAR(255) PRIMARY KEY, " +
+            COLUMN_FOREIGNKEY_CLIENT + " , " +
+            COLUMN_METER_ADDRESS + " VARCHAR(255) NOT NULL, " +
+            COLUMN_LATITUDE + " VARCHAR(100) NOT NULL, " +
+            COLUMN_LONGITUDE + " VARCHAR(100) NOT NULL, " +
+            COLUMN_METER_PRICE + " VARCHAR(10) NOT NULL, " +
+            COLUMN_TIME_PER_USE + " VARCHAR(50) NOT NULL, " +
+            "FOREIGN KEY " + "(" + COLUMN_FOREIGNKEY_CLIENT + ") REFERENCES " + TABLE_CLIENT + "(" + COLUMN_ID + ") );";
+
+    // Inserting a new payment in the meter table
+    public void insertMeter(ParkingMeterData m){
+
+        db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_METER_ID , m.getId());
+        values.put(COLUMN_METER_ADDRESS , m.getAddress());
+        values.put(COLUMN_LATITUDE , m.getLatlng().latitude);
+        values.put(COLUMN_LONGITUDE , m.getLatlng().longitude);
+        values.put(COLUMN_METER_PRICE , m.getPrice());
+        values.put(COLUMN_TIME_PER_USE , m.getTimePerUse());
+        values.put(COLUMN_CLIENT , getForeignInfo());
+
+        db.insert(TABLE_METER , null , values);
+        db.close();
+    }
+
+    public String getPrice(String meterId){
+        db = this.getReadableDatabase();
+        String query = "SELECT " + COLUMN_METER_ID + " FROM " + TABLE_METER;
+        String ID , price = "";
+        Cursor c = db.rawQuery(query , null);
+        if(c.moveToFirst()) {
+            do {
+                ID = c.getString(c.getColumnIndex(COLUMN_METER_ID));
+                if (ID.equals(meterId)) {
+                    String priceFromDb = "SELECT " + COLUMN_METER_PRICE + " FROM " + TABLE_METER + " WHERE " + COLUMN_METER_ID + " = '" + meterId + "';";
+                    Cursor cursor = db.rawQuery(priceFromDb, null);
+                    cursor.moveToFirst();
+                    price = cursor.getString(cursor.getColumnIndex(COLUMN_METER_PRICE));
+                }
+            } while (c.moveToNext());
+        }
+        return price;
+    }
+
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        String drop_client = "DROP TABLE IF EXISTS " + TABLE_NAME;
+        String drop_client = "DROP TABLE IF EXISTS " + TABLE_CLIENT;
         String drop_payment = "DROP TABLE IF EXISTS " + TABLE_PAYMENT;
+        String drop_meter = "DROP TABLE IF EXISTS " + TABLE_METER;
 
         db.execSQL(drop_client);
         db.execSQL(drop_payment);
+        db.execSQL(drop_meter);
         this.onCreate(db);
     }
 }

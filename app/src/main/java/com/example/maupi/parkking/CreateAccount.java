@@ -18,7 +18,7 @@ public class CreateAccount extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_account);
 
-       submit = (Button) findViewById(R.id.submit);
+        submit = (Button) findViewById(R.id.submit);
 
         submit.setOnClickListener(new View.OnClickListener()
         {
@@ -63,8 +63,8 @@ public class CreateAccount extends AppCompatActivity {
 
             if(!pass_str1.equals(pass_str2)){
 
-               Toast pass =  Toast.makeText(CreateAccount.this, "Passwords don't match", Toast.LENGTH_SHORT);
-               pass.show();
+                Toast pass =  Toast.makeText(CreateAccount.this, "Passwords don't match", Toast.LENGTH_SHORT);
+                pass.show();
 
             }else{
 
@@ -85,8 +85,6 @@ public class CreateAccount extends AppCompatActivity {
             }
         }
     }
-
-
 
 
 }

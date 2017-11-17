@@ -123,12 +123,12 @@ public class ParkingMeterData implements Parcelable {
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeStringArray(new String[]
                 {Integer.toString(this.id),
-                Boolean.toString(this.isAvailable),
-                String.valueOf(this.timeTillAvailble),
-                Double.toString(this.price),
-                Integer.toString(this.timePerUse),
-                Double.toString(this.latlng.latitude),
-                Double.toString(this.latlng.longitude),
-                this.address});
+                        Boolean.toString(this.isAvailable),
+                        String.valueOf(this.timeTillAvailble),
+                        Double.toString(this.price),
+                        Integer.toString(this.timePerUse),
+                        Double.toString(this.latlng.latitude),
+                        Double.toString(this.latlng.longitude),
+                        this.address});
     }
 }
