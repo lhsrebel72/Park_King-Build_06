@@ -65,6 +65,13 @@ public class CreateAccount extends AppCompatActivity {
                 return;
             }
 
+            // Make sure the user enters a valid email address
+            if(!isValidEmailAddress(user_email)){
+                email.setError("Please enter a valid email address");
+                return;
+            }
+
+            // Make sure the user verifies the password
             if(!pass_str1.equals(pass_str2)){
 
                 Toast pass =  Toast.makeText(CreateAccount.this, "Passwords don't match", Toast.LENGTH_SHORT);
@@ -91,5 +98,12 @@ public class CreateAccount extends AppCompatActivity {
         }
     }
 
+
+    boolean isValidEmailAddress(String email) {
+        String ePattern = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$";
+        java.util.regex.Pattern p = java.util.regex.Pattern.compile(ePattern);
+        java.util.regex.Matcher m = p.matcher(email);
+        return m.matches();
+    }
 
 }

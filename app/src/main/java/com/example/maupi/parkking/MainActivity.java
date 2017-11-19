@@ -65,6 +65,10 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, CreateAccount.class);
         startActivity(intent);
     }
+    public void getPaymentInfo(){
+        Intent intent = new Intent(this, getPaymentInfo.class);
+        startActivity(intent);
+    }
 
     public void checkLogin(){
 
@@ -83,7 +87,11 @@ public class MainActivity extends AppCompatActivity {
             Toast success =  Toast.makeText(MainActivity.this, "congratulations, logged in successfully", Toast.LENGTH_SHORT);
             success.show();
             helper.userName = userName;
-            goToMap();
+            if(helper.checkPaymentExists()) {
+                goToMap();
+            }else{
+                getPaymentInfo();
+            }
         } else{
             Toast failure =  Toast.makeText(MainActivity.this, "Sorry, wrong username or password", Toast.LENGTH_SHORT);
             failure.show();

@@ -60,7 +60,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
         for(ParkingMeterData p : meters){
-            db.insertMeter(p);
+            if(db.checkMeterTable()){
+                db.insertMeter(p);
+            }
         }
 
         //Puts markers on the map

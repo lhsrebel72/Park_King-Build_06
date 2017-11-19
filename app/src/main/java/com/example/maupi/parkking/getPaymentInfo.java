@@ -49,22 +49,32 @@ public class getPaymentInfo extends AppCompatActivity {
             // Make sure the user enters all the necessary fields for the payment
             if(addressString.isEmpty() || zipString.isEmpty() || cityStateString.isEmpty() || securityCodeString.isEmpty() ||
                     expirationDateString.isEmpty() || cardNumString.isEmpty() || nameString.isEmpty() || countryString.isEmpty()){
-                if(addressString.isEmpty())
+                if(nameString.isEmpty())
+                    name.setError("Name on card is required");
+                else if(cardNumString.isEmpty())
+                    cardNum.setError("Card number is required");
+                else if(expirationDateString.isEmpty())
+                    expirationDate.setError("Expiration date is required");
+                else if(securityCodeString.isEmpty())
+                    securityCode.setError("Security code is required");
+                else if(addressString.isEmpty())
                     address.setError("Address is required");
                 else if(zipString.isEmpty())
                     zip.setError("Zip code is required");
                 else if(cityStateString.isEmpty())
                     cityState.setError("State and city are required");
-                else if(securityCodeString.isEmpty())
-                    securityCode.setError("Security code is required");
-                else if(expirationDateString.isEmpty())
-                    expirationDate.setError("Expiration date is required");
-                else if(cardNumString.isEmpty())
-                    cardNum.setError("Card number is required");
-                else if(nameString.isEmpty())
-                    name.setError("Name on card is required");
                 else
                     country.setError("Country is required");
+                return;
+            }
+
+            if(cardNumString.length() < 16 || cardNumString.length() > 16){
+                cardNum.setError("Please enter a valid card number");
+                return;
+            }
+
+            if(securityCodeString.length() < 3 || securityCodeString.length() > 3){
+                securityCode.setError("Please enter a valid security code");
                 return;
             }
 

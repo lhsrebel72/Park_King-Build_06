@@ -212,6 +212,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return id;
     }
 
+    // Get the id of the user if he/she has payment info inserted
+    public boolean checkPaymentExists(){
+        boolean paymentMade = false;
+        db = this.getReadableDatabase();
+        String checkExistence = "SELECT " + COLUMN_CLIENT + " FROM " + TABLE_PAYMENT + ";";
+        String userExist , id = "";
+        Cursor c = db.rawQuery(checkExistence , null);
+        if(c.moveToFirst()){
+            do{
+                userExist = c.getString(c.getColumnIndex(COLUMN_CLIENT));
+                if(userExist.equals(getForeignInfo())){
+                    paymentMade = true;
+                }
+            }while(c.moveToNext());
+        }
+        return paymentMade;
+    }
+
     /******************************************************************************************************************
      * Creating the meter table in the database and handling the following functions                                *
      ******************************************************************************************************************/
@@ -224,7 +242,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_TIME_PER_USE = "usagetime";
     private static final String COLUMN_FOREIGNKEY_CLIENT = "client";
 
-    private static final String CREATE_TABLE_METER = "CREATE TABLE " + TABLE_METER + "(" +
+    private static final String CREATE_TABLE_METER = "CREATE TABLE IF NOT EXISTS " + TABLE_METER + "(" +
             COLUMN_METER_ID + " VARCHAR(255) PRIMARY KEY, " +
             COLUMN_FOREIGNKEY_CLIENT + " , " +
             COLUMN_METER_ADDRESS + " VARCHAR(255) NOT NULL, " +
@@ -233,6 +251,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             COLUMN_METER_PRICE + " VARCHAR(10) NOT NULL, " +
             COLUMN_TIME_PER_USE + " VARCHAR(50) NOT NULL, " +
             "FOREIGN KEY " + "(" + COLUMN_FOREIGNKEY_CLIENT + ") REFERENCES " + TABLE_CLIENT + "(" + COLUMN_ID + ") );";
+
+    //Check if the meter table is empty or not
+    public boolean checkMeterTable(){
+        boolean empty = false;
+        db = this.getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_METER + " ;";
+        Cursor c = db.rawQuery(query , null);
+        if(c.moveToFirst()) {
+            return empty;
+        }else{
+            empty = true;
+            return empty;
+        }
+    }
 
     // Inserting a new payment in the meter table
     public void insertMeter(ParkingMeterData m){
@@ -245,7 +277,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(COLUMN_LONGITUDE , m.getLatlng().longitude);
         values.put(COLUMN_METER_PRICE , m.getPrice());
         values.put(COLUMN_TIME_PER_USE , m.getTimePerUse());
-        values.put(COLUMN_CLIENT , getForeignInfo());
+        //values.put(COLUMN_CLIENT , getForeignInfo());
 
         db.insert(TABLE_METER , null , values);
         db.close();
