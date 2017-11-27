@@ -131,12 +131,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_ZIP_CODE = "ZipCode";
     private static final String COLUMN_BILLING_ADDRESS = "BillingAddress";
     private static final String COLUMN_CITY_STATE = "CityState";
+    private static final String COLUMN_CARD_BRAND = "CardBrand";
 
     private static final String CREATE_TABLE_PAYMENT = "CREATE TABLE " + TABLE_PAYMENT + "(" +
             COLUMN_PAYMENT_ID + " INTEGER PRIMARY KEY AUTOINCREMENT , " +
             COLUMN_CLIENT + " , " +
             COLUMN_NAME + " VARCHAR(255) NOT NULL , " +
             COLUMN_CARD_NUMBER + " VARCHAR(15) , " +
+            COLUMN_CARD_BRAND + " VARCHAR(30) , " +
             COLUMN_SECURITY_CODE + " VARCHAR(5) NOT NULL , " +
             COLUMN_EXP_DATE + " VARCHAR(10) NOT NULL , " +
             COLUMN_BILLING_ADDRESS + " VARCHAR(50) NOT NULL , " +
@@ -185,6 +187,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(COLUMN_CITY_STATE , p.getCityState());
         values.put(COLUMN_COUNTRY , p.getCountry());
         values.put(COLUMN_CLIENT , getForeignInfo());
+        values.put(COLUMN_CARD_BRAND , p.getCardType());
 
 
         db.insert(TABLE_PAYMENT , null , values);

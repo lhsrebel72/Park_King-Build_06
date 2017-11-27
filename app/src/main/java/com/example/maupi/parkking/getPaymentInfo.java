@@ -94,7 +94,7 @@ public class getPaymentInfo extends AppCompatActivity {
                 return;
             }
 
-            if(cardNumString.length() < 16 || cardNumString.length() > 16){
+            if(cardNumString.length() < 14 || cardNumString.length() > 16){
                 cardNum.setError("Please enter a valid card number");
                 return;
             }
