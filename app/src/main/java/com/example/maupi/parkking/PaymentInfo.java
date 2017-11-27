@@ -5,7 +5,7 @@ package com.example.maupi.parkking;
  */
 
 public class PaymentInfo {
-    String address, zip, cityState, country, cardNum, securityCode, expDate, nameOnCard;
+    String address, zip, cityState, country, cardNum, securityCode, expDate, nameOnCard, cardType;
 
     public String getAddress(){return address;}
     public String getZip(){return zip;}
@@ -15,6 +15,7 @@ public class PaymentInfo {
     public String getSecurityCode(){return securityCode;}
     public String getExpDate(){return expDate;}
     public String getNameOnCard(){return nameOnCard;}
+    public String getCardType(){return cardType;}
 
     public void setAddress(String addressString){address = addressString;}
     public void setZip(String zipString){zip=zipString;}
@@ -24,4 +25,5 @@ public class PaymentInfo {
     public void setSecurityCode(String securityCodeString){securityCode=securityCodeString;}
     public void setExpDate(String expDateString){expDate=expDateString;}
     public void setNameOnCard(String nameOnCardString){nameOnCard=nameOnCardString;}
+    public void setCardType(String cardTypeString){cardType=cardTypeString;}
 }

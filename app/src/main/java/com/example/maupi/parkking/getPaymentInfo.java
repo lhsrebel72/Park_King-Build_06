@@ -7,6 +7,8 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import java.util.regex.Pattern;
+
 public class getPaymentInfo extends AppCompatActivity {
 
     DatabaseHelper helper = new DatabaseHelper(this);
@@ -45,6 +47,30 @@ public class getPaymentInfo extends AppCompatActivity {
             String cardNumString = cardNum.getText().toString();
             String nameString = name.getText().toString();
             String countryString = country.getText().toString();
+            CardType tempCardBrand = CardType.detect(cardNumString);
+            String cardBrand;
+            if(tempCardBrand == CardType.VISA){
+                cardBrand = "Visa";
+            }
+            else if(tempCardBrand == CardType.MASTERCARD){
+                cardBrand = "Mastercard";
+            }
+            else if(tempCardBrand == CardType.UNKNOWN){
+                cardBrand = "Unknown";
+            }
+            else if(tempCardBrand == CardType.DISCOVER){
+                cardBrand = "Discover";
+            }
+            else if(tempCardBrand == CardType.AMERICAN_EXPRESS){
+                cardBrand = "American Express";
+            }
+            else if(tempCardBrand == CardType.DINERS_CLUB){
+                cardBrand = "Diners Club";
+            }
+            else if(tempCardBrand == CardType.JCB){
+                cardBrand = "JCB";
+            }
+            else cardBrand = "unknown";
 
             // Make sure the user enters all the necessary fields for the payment
             if(addressString.isEmpty() || zipString.isEmpty() || cityStateString.isEmpty() || securityCodeString.isEmpty() ||
@@ -89,6 +115,7 @@ public class getPaymentInfo extends AppCompatActivity {
                 p.setNameOnCard(nameString);
                 p.setSecurityCode(securityCodeString);
                 p.setZip(zipString);
+                p.setCardType(cardBrand);
 
                 helper.insertPayment(p);
                 Toast c = Toast.makeText(getPaymentInfo.this, "payment info accepted", Toast.LENGTH_SHORT);
@@ -100,6 +127,37 @@ public class getPaymentInfo extends AppCompatActivity {
                 unique.show();
             }
         }
+    }
+    public enum CardType {
+
+        UNKNOWN,
+        VISA("^4[0-9]{12}(?:[0-9]{3})?$"),
+        MASTERCARD("^5[1-5][0-9]{14}$"),
+        AMERICAN_EXPRESS("^3[47][0-9]{13}$"),
+        DINERS_CLUB("^3(?:0[0-5]|[68][0-9])[0-9]{11}$"),
+        DISCOVER("^6(?:011|5[0-9]{2})[0-9]{12}$"),
+        JCB("^(?:2131|1800|35\\d{3})\\d{11}$");
+
+        private Pattern pattern;
+
+        CardType() {
+            this.pattern = null;
+        }
+
+        CardType(String pattern) {
+            this.pattern = Pattern.compile(pattern);
+        }
+
+        public static CardType detect(String cardNumber) {
+
+            for (CardType cardType : CardType.values()) {
+                if (null == cardType.pattern) continue;
+                if (cardType.pattern.matcher(cardNumber).matches()) return cardType;
+            }
+
+            return UNKNOWN;
+        }
+
     }
 }
 
